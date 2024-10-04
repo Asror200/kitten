@@ -15,7 +15,10 @@ def create_user_profile(sender, instance, **kwargs):
         subject = 'A new cat was added'
         message = f'{instance.name} was added by {instance.user.username}.'
         from_email = EMAIL_DEFAULT_SENDER
-        recipient_list = [user.email for user in User.objects.all() if user.email and user.cats.breed == instance.breed]
+        recipient_list = [
+            user.email for user in User.objects.all()
+            if user.email and any(cat.breed == instance.breed for cat in user.cats.all())
+        ]
         send_mail(subject, message, from_email, recipient_list)
 
 
@@ -64,7 +67,6 @@ def pre_delete_customer(sender, instance, **kwargs):
         'text': instance.text,
         'cat': instance.cat.name,
         'username': instance.user.username,
-
 
     }
 
